@@ -28,31 +28,20 @@ class ImageFormatter implements Formatter
      *
      * @type  string
      */
-    private $errorImgResource = 'pixel.png';
+    private $errorImgResource;
 
     /**
      * constructor
      *
      * @param  \stubbles\lang\ResourceLoader  $resourceLoader
+     * @param  string                         $errorImgResource  optional  image to be displayed in case of errors
      * @Inject
+     * @Property{errorImgResource}('stubbles.img.error')
      */
-    public function __construct(ResourceLoader $resourceLoader)
+    public function __construct(ResourceLoader $resourceLoader, $errorImgResource = 'pixel.png')
     {
-        $this->resourceLoader = $resourceLoader;
-    }
-
-    /**
-     * sets image to be displayed in case of errors
-     *
-     * @param   string  $errorImgResource
-     * @return  stubbles\webapp\img\ImageFormatter
-     * @Inject(optional=true)
-     * @Property('stubbles.img.error')
-     */
-    public function useErrorImgResource($errorImgResource)
-    {
+        $this->resourceLoader   = $resourceLoader;
         $this->errorImgResource = $errorImgResource;
-        return $this;
     }
 
     /**

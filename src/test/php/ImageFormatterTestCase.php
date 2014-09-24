@@ -48,23 +48,14 @@ class ImageFormatterTestCase extends \PHPUnit_Framework_TestCase
      */
     public function annotationsPresentOnConstructor()
     {
-        $this->assertTrue(
-                lang\reflectConstructor($this->imageFormatter)->hasAnnotation('Inject')
-        );
-    }
+        $constructor = lang\reflectConstructor($this->imageFormatter);
+        $this->assertTrue($constructor->hasAnnotation('Inject'));
 
-    /**
-     * @test
-     */
-    public function annotationsPresentOnUseErrorImgResourceMethod()
-    {
-        $method = lang\reflect($this->imageFormatter, 'useErrorImgResource');
-        $this->assertTrue($method->hasAnnotation('Inject'));
-        $this->assertTrue($method->getAnnotation('Inject')->isOptional());
-        $this->assertTrue($method->hasAnnotation('Property'));
+        $parameters = $constructor->getParameters();
+        $this->assertTrue($parameters[1]->hasAnnotation('Property'));
         $this->assertEquals(
                 'stubbles.img.error',
-                $method->getAnnotation('Property')->getValue()
+                $parameters[1]->getAnnotation('Property')->getValue()
         );
     }
 
@@ -85,7 +76,6 @@ class ImageFormatterTestCase extends \PHPUnit_Framework_TestCase
      */
     public function formatReturnsImageDefinedByGivenResource()
     {
-
         $this->assertEquals(
                 Image::load($this->rootpath->to('src/main/resources/pixel.png'))->fileName(),
                 $this->imageFormatter->format('pixel.png', new Headers())->fileName()
@@ -124,10 +114,10 @@ class ImageFormatterTestCase extends \PHPUnit_Framework_TestCase
      */
     public function returnsImageForAllErrorMethodsWithDifferentImage($method, $params)
     {
-        $this->imageFormatter->useErrorImgResource('error.png');
+        $imageFormatter = new ImageFormatter(new ResourceLoader(), 'error.png');
         $this->assertEquals(
                 Image::load($this->rootpath->to('src/main/resources/error.png'))->fileName(),
-                call_user_func_array([$this->imageFormatter, $method], $params)->fileName()
+                call_user_func_array([$imageFormatter, $method], $params)->fileName()
         );
     }
 }
